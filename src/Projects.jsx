@@ -18,6 +18,17 @@ const Projects = ({ t, resumeData, handleInputChange, handleAddSection, handleRe
                         />
                     </div>
                     <div className="form-field">
+                        <label htmlFor={`projectURL-${proj.id}`} className="form-label">{t.projectURL}</label>
+                        <input
+                            id={`projectURL-${proj.id}`}
+                            type="url"
+                            name="url"
+                            placeholder={t.projectURLPlaceholder}
+                            value={proj.url}
+                            onChange={(e) => handleInputChange(e, 'projects', proj.id)}
+                        />
+                    </div>
+                    <div className="form-field">
                         <label htmlFor={`projectDescription-${proj.id}`} className="form-label">{t.projectDescription}</label>
                         <textarea
                             id={`projectDescription-${proj.id}`}

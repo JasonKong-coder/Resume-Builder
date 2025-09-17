@@ -19,7 +19,7 @@ import DraggableSection from './DraggableSect.jsx';
 
 Font.register({
   family: 'Noto Sans SC',
-  src: '/src/NotoSansSC-Regular.ttf' // <-- 请将此路径修改为你字体文件的实际路径
+  src: '/src/NotoSansSC-Regular.ttf' // <-- 请将此路径修改为字体文件的实际路径
 });
 
 const ResumeDocument = ({ resumeData, t, sectionOrder }) => {
@@ -254,6 +254,8 @@ const App = () => {
     addProject: 'Add Project',
     projectTitle: 'Project Title',
     projectTitlePlaceholder: 'e.g. E-commerce Website',
+    projectURL:'URL',
+    projectURLPlaceholder:'Website URL (optional)',
     projectDescription: 'Description',
     projectDescriptionPlaceholder: 'Briefly describe your project',
     awards: 'Awards',
@@ -346,6 +348,8 @@ const App = () => {
     addProject: '添加项目',
     projectTitle: '项目名称',
     projectTitlePlaceholder: '例如：电子商务网站',
+    projectURL: '网址',
+    projectURLPlaceholder: '网址 (可选)',
     projectDescription: '项目描述',
     projectDescriptionPlaceholder: '简要描述你的项目',
     awards: '荣誉奖项',
@@ -415,6 +419,7 @@ const App = () => {
       id: crypto.randomUUID(),
       title: '',
       description: '',
+      url: '',
     }],
     awards: [{
       id: crypto.randomUUID(),
@@ -768,7 +773,13 @@ const App = () => {
                     <h3>{t.projects}</h3>
                     {resumeData.projects.map((proj) => (
                       <div key={proj.id} className="project-entry">
-                        <h4>{proj.title}</h4>
+                        <h4 className='project-title'>
+                          {proj.url ? (
+                            <a href={proj.url} target="_blank" rel="noopener noreferrer">{proj.title}</a>
+                          ) : (
+                            <span>{proj.title}</span>
+                          )}
+                        </h4>
                         <p>{proj.description}</p>
                       </div>
                     ))}
