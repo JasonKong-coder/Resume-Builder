@@ -206,6 +206,26 @@ textarea {
     margin-bottom: 1rem;
 }
 
+/* 优化上传区预览容器样式，居中显示图片和按钮 */
+.avatar-preview-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+
+.avatar-preview-container .avatar-preview {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #007bff;
+    margin: auto;
+    display: block;
+}
+
 .avatar-image {
     width: 100%;
     height: 100%;
@@ -480,6 +500,22 @@ textarea {
     --resume-bg-color: var(--custom-background);
     --resume-text-color: var(--custom-text);
     --resume-border-color: var(--custom-border);
+}
+
+.theme-classic .resume-content {
+    font-family: 'Noto Sans SC', Arial, sans-serif;
+}
+
+.theme-modern .resume-content {
+    font-family: 'ChironGoRoundTC', Arial, sans-serif;
+}
+
+.theme-minimalist .resume-content {
+    font-family: 'Noto Serif SC', serif;
+}
+
+.theme-custom .resume-content {
+    font-family: var(--custom-font, 'Noto Sans SC'), Arial, sans-serif;
 }
 
 /* 移除颜色选择器的边框 */

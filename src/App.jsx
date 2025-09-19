@@ -1,5 +1,5 @@
 import React, { useState,useRef,useEffect } from 'react';
-import { Page, Text, View, Document, StyleSheet, Font, PDFDownloadLink } from '@react-pdf/renderer';
+import { Page, Text, View, Document, StyleSheet, Font, PDFDownloadLink, Image } from '@react-pdf/renderer';
 import './App.css';
 import { DndContext, closestCenter, useSensors, useSensor, MouseSensor, TouchSensor } from '@dnd-kit/core';
 import { arrayMove, SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
@@ -17,22 +17,33 @@ import Awards from './Awards.jsx';
 import Volunteering from './Volunteering.jsx';
 import DraggableSection from './DraggableSect.jsx';
 
+// 注册本地和网络字体，供 PDF 使用
 Font.register({
   family: 'Noto Sans SC',
-  src: '/src/NotoSansSC-Regular.ttf' // <-- 请将此路径修改为字体文件的实际路径
+  src: './src/NotoSansSC-VariableFont_wght.ttf'
+});
+Font.register({
+  family: 'Noto Serif SC',
+  src: './src/NotoSerifSC-VariableFont_wght.ttf'
+});
+Font.register({
+  family: 'ChironGoRoundTC',
+  src: './src/ChironGoRoundTC-VariableFont_wght.ttf'
 });
 
-const ResumeDocument = ({ resumeData, t, sectionOrder }) => {
+const ResumeDocument = ({ resumeData, t, sectionOrder, theme, customColors }) => {
   const renderSection = (sectionName) => {
     const { personalInfo, workExperience, education, projects, certificate, awards, skills, languages, volunteering, website, aboutMe } = resumeData;
-
     const sections = {
-      personalInfo: (
-        <View style={styles.section} key="personalInfo">
-          <Text style={styles.name}>{personalInfo.name}</Text>
-          <Text style={styles.p}>Email: {personalInfo.email}</Text>
-          <Text style={styles.p}>Phone: {personalInfo.phone}</Text>
-        </View>
+      personalInfo: personalInfo && (
+      <View style={styles.section} key="personalInfo">
+        {resumeData.personalInfo?.avatar && (
+        <Image style={styles.avatar} src={resumeData.personalInfo.avatar} />
+        )}
+        <Text style={styles.name}>{resumeData.personalInfo?.name}</Text>
+        <Text style={styles.p}>Email: {resumeData.personalInfo?.email}</Text>
+        <Text style={styles.p}>Phone: {resumeData.personalInfo?.phone}</Text>
+      </View>
       ),
       aboutMe: aboutMe && (
         <View style={styles.section} key="aboutMe">
@@ -40,7 +51,7 @@ const ResumeDocument = ({ resumeData, t, sectionOrder }) => {
           <Text style={styles.p}>{aboutMe}</Text>
         </View>
       ),
-      workExperience: workExperience.length > 0 && workExperience[0].company !== '' && (
+      workExperience: workExperience.length > 0 && workExperience.filter(item => item.company).length > 0 && (
         <View style={styles.section} key="workExperience">
           <Text style={styles.h2}>{t.workExperience}</Text>
           {workExperience.map((job) => (
@@ -63,7 +74,7 @@ const ResumeDocument = ({ resumeData, t, sectionOrder }) => {
           ))}
         </View>
       ),
-      projects: projects.length > 0 && projects[0].title !== '' && (
+      projects: projects.length > 0 && projects[0]?.title !== '' && (
         <View style={styles.section} key="projects">
           <Text style={styles.h2}>{t.projects}</Text>
           {projects.map((proj) => (
@@ -116,7 +127,7 @@ const ResumeDocument = ({ resumeData, t, sectionOrder }) => {
           ))}
         </View>
       ),
-      websites: website.length > 0 && website[0].url !== '' && (
+      website: website.length > 0 && website[0].url !== '' && (
         <View style={styles.section} key="websites">
           <Text style={styles.h2}>{t.websites}</Text>
           {website.map((site) => (
@@ -130,6 +141,78 @@ const ResumeDocument = ({ resumeData, t, sectionOrder }) => {
     return sections[sectionName];
   };
 
+  // 根据 theme 和 customColors 动态设置 PDF 样式
+  let fontFamily = 'Noto Sans SC';
+  let bgColor = '#ffffff';
+  let textColor = '#333333';
+  let borderColor = '#cccccc';
+  if (theme === 'modern') {
+    fontFamily = 'ChironGoRoundTC';
+    bgColor = '#f7f9fc';
+    textColor = '#1a2a4b';
+    borderColor = '#a0c3d9';
+  } else if (theme === 'minimalist') {
+    fontFamily = 'Noto Serif SC';
+    bgColor = '#fefefe';
+    textColor = '#444444';
+    borderColor = '#eeeeee';
+  } else if (theme === 'custom') {
+    fontFamily = 'Noto Sans SC';
+    bgColor = customColors?.background || '#ffffff';
+    textColor = customColors?.text || '#333333';
+    borderColor = customColors?.border || '#cccccc';
+  }
+  const styles = StyleSheet.create({
+    page: {
+      flexDirection: 'column',
+      backgroundColor: bgColor,
+      padding: 40,
+      fontFamily: fontFamily,
+      color: textColor,
+    },
+    section: {
+      marginBottom: 10,
+      paddingBottom: 5,
+      borderBottomWidth: 1,
+      borderBottomColor: borderColor,
+    },
+    avatar: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    marginBottom: 10,
+    alignSelf: 'center',
+    },
+    name: {
+      fontSize: 24,
+      textAlign: 'center',
+      marginBottom: 10,
+      fontFamily: fontFamily,
+      color: textColor,
+    },
+    h2: {
+      fontSize: 18,
+      marginBottom: 5,
+      fontFamily: fontFamily,
+      color: textColor,
+    },
+    h3: {
+      fontSize: 14,
+      marginBottom: 5,
+      fontFamily: fontFamily,
+      color: textColor,
+    },
+    p: {
+      fontSize: 12,
+      marginBottom: 2,
+      fontFamily: fontFamily,
+      color: textColor,
+    },
+    itemContainer: {
+      marginBottom: 10,
+    },
+  });
+
   return (
     <Document>
       <Page size="A4" style={styles.page}>
@@ -139,40 +222,7 @@ const ResumeDocument = ({ resumeData, t, sectionOrder }) => {
   );
 };
 
-const styles = StyleSheet.create({
-  page: {
-    flexDirection: 'column',
-    backgroundColor: '#ffffff',
-    padding: 40,
-    fontFamily: 'Noto Sans SC',
-  },
-  section: {
-    marginBottom: 10,
-    paddingBottom: 5,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
-  },
-  name: {
-    fontSize: 24,
-    textAlign: 'center',
-    marginBottom: 10,
-  },
-  h2: {
-    fontSize: 18,
-    marginBottom: 5,
-  },
-  h3: {
-    fontSize: 14,
-    marginBottom: 5,
-  },
-  p: {
-    fontSize: 12,
-    marginBottom: 2,
-  },
-  itemContainer: {
-    marginBottom: 10,
-  },
-});
+
 
 const App = () => {
   const resumeRef = useRef(null);
@@ -238,6 +288,7 @@ const App = () => {
     remove: 'Remove',
     resumePreview: 'Resume Preview',
     generatePdf: 'Generate PDF',
+    loading: 'Loading...',
     uploadAvatar: 'Upload Avatar',
     avatar: 'Avatar',
     theme: 'Theme',
@@ -254,8 +305,8 @@ const App = () => {
     addProject: 'Add Project',
     projectTitle: 'Project Title',
     projectTitlePlaceholder: 'e.g. E-commerce Website',
-    projectURL:'URL',
-    projectURLPlaceholder:'Website URL (optional)',
+    projectURL: 'URL',
+    projectURLPlaceholder: 'Website URL (optional)',
     projectDescription: 'Description',
     projectDescriptionPlaceholder: 'Briefly describe your project',
     awards: 'Awards',
@@ -332,6 +383,7 @@ const App = () => {
     remove: '移除',
     resumePreview: '简历预览',
     generatePdf: '生成 PDF',
+    loading: '加载中...',
     uploadAvatar: '上传头像',
     avatar: '头像',
     theme: '主题',
@@ -366,6 +418,7 @@ const App = () => {
     rolePlaceholder: '例如：活动协调员',
   }
 };
+
   const [language, setLanguage] = useState('en'); // <--语言
   const [theme, setTheme] = useState('classic'); // <-- 主题状态
   const [customColors, setCustomColors] = useState({ // <-- 自定义颜色状态
@@ -374,10 +427,12 @@ const App = () => {
     border: '#cccccc',
   });
   const [resumeData, setResumeData] = useState({
+    personalInfo: {
     avatar: null,
     name: '',
     email: '',
     phone: '',
+    },
     workExperience: [{
     id: crypto.randomUUID(),
     company: '',
@@ -484,7 +539,7 @@ const App = () => {
       if (file) {
         const reader = new FileReader();
         reader.onloadend = () => {
-          setResumeData(prevData => ({ ...prevData, avatar: reader.result }));
+          setResumeData(prevData => ({ ...prevData,personalInfo: { ...prevData.personalInfo, avatar: reader.result }}));
         };
         reader.readAsDataURL(file);
       }
@@ -493,7 +548,11 @@ const App = () => {
   // 处理静态字段的函数
   const handlePersonalInfoChange = (e) => {
     const { name, value } = e.target;
-    setResumeData(prevData => ({ ...prevData, [name]: value }));
+    setResumeData(prevData => ({ ...prevData, 
+       personalInfo: {
+      ...prevData.personalInfo,
+      [name]: value }
+    }));
   };
 
   // 处理动态列表的函数，需要 section 和 id
@@ -614,7 +673,7 @@ const App = () => {
           <AboutMe
             t={t}
             resumeData={resumeData}
-            handlePersonalInfoChange={handlePersonalInfoChange}
+            handlePersonalInfoChange={(e) => handleInputChange(e, 'aboutMe')}
           />
         </DraggableSection>
         
@@ -688,7 +747,7 @@ const App = () => {
           />
         </DraggableSection>
         
-        <DraggableSection id="Volunteering">
+        <DraggableSection id="volunteering">
           <Volunteering
             t={t}
             resumeData={resumeData}
@@ -722,11 +781,11 @@ const App = () => {
               return (
                 <section key={sectionId} className='personal-info-preview'>
                   {resumeData.avatar && (
-                    <img src={resumeData.avatar} alt="Avatar" className='avatar-preview' />
+                    <img src={resumeData.personalInfo.avatar} alt="Avatar" className='avatar-preview' />
                   )}
-                  <h3>{resumeData.name}</h3>
-                  <p>邮箱/Email: {resumeData.email}</p>
-                  <p>电话/Contact: {resumeData.phone}</p>
+                  <h3>{resumeData.personalInfo.name}</h3>
+                  <p>邮箱/Email: {resumeData.personalInfo.email}</p>
+                  <p>电话/Contact: {resumeData.personalInfo.phone}</p>
                 </section>
               );
               case 'aboutMe':
@@ -870,16 +929,17 @@ const App = () => {
           })}
         </div>
         <div>
-          <PDFDownloadLink
-            document={<ResumeDocument resumeData={resumeData} t={t} sectionOrder={sectionOrder} />}
+            <PDFDownloadLink
+            document={<ResumeDocument resumeData={resumeData} t={t} sectionOrder={sectionOrder} theme={theme} customColors={customColors} />}
             fileName="resume.pdf"
             className="generate-pdf-button"
-          >
-            {({ loading }) =>
-              loading ? t.loading : t.generatePdf
-            }
-          </PDFDownloadLink>
-        </div>
+
+            >
+              {({ loading }) =>
+               loading ? t.loading : t.generatePdf
+               }
+            </PDFDownloadLink>
+            </div>
       </div>
     </main>
   </div>

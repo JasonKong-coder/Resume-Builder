@@ -7,10 +7,18 @@ const PersonalInfo = ({ t, resumeData, handlePersonalInfoChange, handleAvatarCha
       <div className='form-group'>
         {/* 头像上传功能 */}
         <div className='avatar-upload'>
-          {resumeData.avatar ? (
+          {resumeData.personalInfo.avatar ? (
             <div className='avatar-preview-container'>
-              <img src={resumeData.avatar} alt="Avatar" className="avatar-preview" />
-              <button onClick={() => handleAvatarChange({ target: { files: [] } })} className="remove-avatar-button">X</button>
+              <label htmlFor="avatar-upload" style={{cursor: 'pointer', display: 'block'}}>
+                <img src={resumeData.personalInfo.avatar} alt="Avatar" className="avatar-preview" />
+                <input
+                  id="avatar-upload"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleAvatarChange}
+                  style={{ display: 'none' }}
+                />
+              </label>
             </div>
           ) : (
             <label htmlFor="avatar-upload" className="avatar-placeholder">
@@ -32,7 +40,7 @@ const PersonalInfo = ({ t, resumeData, handlePersonalInfoChange, handleAvatarCha
           type="text"
           name="name"
           placeholder={t.namePlaceholder}
-          value={resumeData.name}
+          value={resumeData.personalInfo.name}
           onChange={handlePersonalInfoChange}
         />
         
@@ -42,7 +50,7 @@ const PersonalInfo = ({ t, resumeData, handlePersonalInfoChange, handleAvatarCha
           type="email"
           name="email"
           placeholder={t.emailPlaceholder}
-          value={resumeData.email}
+          value={resumeData.personalInfo.email}
           onChange={handlePersonalInfoChange}
         />
         
@@ -52,7 +60,7 @@ const PersonalInfo = ({ t, resumeData, handlePersonalInfoChange, handleAvatarCha
           type="tel"
           name="phone"
           placeholder={t.phonePlaceholder}
-          value={resumeData.phone}
+          value={resumeData.personalInfo.phone}
           onChange={handlePersonalInfoChange}
         />
       </div>
