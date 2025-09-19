@@ -1,5 +1,6 @@
 {
   "name": "resume-builder",
+  "homepage": "https://jasonkong-coder.github.io/Resume-Builder/",
   "private": true,
   "version": "0.0.0",
   "type": "module",
