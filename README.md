@@ -1,111 +1,121 @@
 # 📄 Resume Builder
 
-A modern resume builder built with **React + Vite**.  
-It allows you to create, preview, customize, and export your resume as a professional PDF.
+A simple and customizable **Resume Builder** built with React and Vite.
+Create, preview, and export your resume to PDF with ease.
+
+🌐 **Live Demo**: [Resume Builder](https://jasonkong-coder.github.io/Resume-Builder/)
 
 ---
 
 ## ✨ Features
-- 🖼 **Avatar Upload & Remove**: Add your profile picture and keep it in the exported PDF  
-- 📌 **Real-time Preview**: Instantly see updates as you type  
-- 🖱 **Drag & Drop Sorting**: Reorder sections (experience, education, skills, etc.) freely  
-- 🎨 **Themes & Customization**: Switch between classic / modern / minimalist themes, or use custom colors  
-- 🌍 **Multi-language Support**: English & Chinese  
-- 📑 **PDF Export**: Export a clean, print-ready PDF resume  
 
----
-
-## 🛠 Tech Stack
-- **React 18** + **Vite 7**  
-- **Custom CSS** (responsive design)  
-- **dnd-kit** (drag & drop functionality)  
-- **@react-pdf/renderer** (PDF generation)  
-- **gh-pages** (GitHub Pages deployment)  
+* **Real-time Preview** → Instantly see your resume as you type.
+* **Drag & Drop** → Rearrange resume sections effortlessly.
+* **Multi-language Support** → English & Chinese supported.
+* **Avatar Upload** → Add or remove your profile picture.
+* **PDF Export** → Download a clean, professional PDF resume.
 
 ---
 
 ## 🚀 Getting Started
 
+### 1. Clone the project
+
 ```bash
-# Clone the project
 git clone https://github.com/jasonkong-coder/Resume-Builder.git
 cd Resume-Builder
+```
 
-# Install dependencies
+### 2. Install dependencies
+
+```bash
 npm install
+```
 
-# Run in development
+### 3. Run the app
+
+```bash
 npm run dev
+```
 
-# Build for production
-npm run build
-
-# Deploy to GitHub Pages
-npm run deploy
-···
-🌐 Live Demo
-👉 [View Online](https://jasonkong-coder.github.io/Resume-Builder/)
-
-📸 Screenshots
-(Add some screenshots of the form editor and PDF preview)
-
-📜 License
-MIT License
----
-
-## ✅ 中文版 README
-
-```markdown
-# 📄 简历生成器
-
-一个基于 **React + Vite** 的现代化简历生成工具。  
-支持实时预览、模块拖拽排序、主题切换，并可一键导出 PDF 简历。
+The app will open in your browser at `http://localhost:5173`.
 
 ---
 
-## ✨ 功能特色
-- 🖼 **头像上传与删除**：支持上传头像，并在 PDF 中保留  
-- 📌 **实时预览**：填写表单时简历自动更新  
-- 🖱 **拖拽排序**：自由调整工作经验、教育、技能等模块顺序  
-- 🎨 **主题与自定义**：内置经典 / 现代 / 简洁主题，支持自定义颜色  
-- 🌍 **多语言支持**：中英文切换  
-- 📑 **PDF 导出**：生成美观、可打印的 PDF 简历  
+## 🛠 Tech Stack
+
+* **React 18**
+* **Vite**
+* **CSS3** (custom styling)
+* **@react-pdf/renderer**
+* **@dnd-kit / @hello-pangea/dnd** (drag & drop)
+
+---
+
+## 🤝 Contributions
+
+Contributions are welcome!
+If you find bugs or have suggestions, feel free to submit an **Issue** or a **Pull Request**.
+
+---
+
+# 📝 简历生成器
+
+一个基于 React 和 Vite 的 **简历生成器**，可实时预览并导出 PDF。
+操作简单，轻松定制属于你的专业简历。
+
+🌐 **在线预览**: [Resume Builder](https://jasonkong-coder.github.io/Resume-Builder/)
+
+---
+
+## ✨ 功能特点
+
+* **实时预览** → 边写边看效果
+* **拖拽排序** → 自由调整板块顺序
+* **多语言支持** → 支持中文与英文
+* **头像上传** → 上传或删除个人头像
+* **PDF 导出** → 一键生成简洁 PDF 简历
+
+---
+
+## 🚀 使用步骤
+
+### 1. 克隆项目
+
+```bash
+git clone https://github.com/jasonkong-coder/Resume-Builder.git
+cd Resume-Builder
+```
+
+### 2. 安装依赖
+
+```bash
+npm install
+```
+
+### 3. 运行应用
+
+```bash
+npm run dev
+```
+
+应用会在浏览器中自动打开，默认地址为 `http://localhost:5173`。
 
 ---
 
 ## 🛠 技术栈
-- **React 18** + **Vite 7**  
-- **自定义 CSS**（响应式设计）  
-- **dnd-kit**（拖拽排序）  
-- **@react-pdf/renderer**（PDF 生成）  
-- **gh-pages**（GitHub Pages 部署）  
+
+* **React 18**
+* **Vite**
+* **CSS3**
+* **@react-pdf/renderer**
+* **@dnd-kit / @hello-pangea/dnd**
 
 ---
 
-## 🚀 使用方法
+## 🤝 贡献
 
-```bash
-# 克隆项目
-git clone https://github.com/jasonkong-coder/Resume-Builder.git
-cd Resume-Builder
+欢迎任何形式的贡献！
+如果你发现 Bug 或有新的功能建议，请提交 **Issue** 或 **Pull Request**。
 
-# 安装依赖
-npm install
-
-# 启动开发服务器
-npm run dev
-
-# 构建生产版本
-npm run build
-
-# 部署到 GitHub Pages
-npm run deploy
-···
-🌐 在线预览
-👉 [点击查看](https://jasonkong-coder.github.io/Resume-Builder/)
-
-📸 截图
-（放上表单填写和 PDF 导出效果图）
-
-📜 许可证
-MIT License
+---
