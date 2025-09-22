@@ -21,15 +21,15 @@ import ErrorBoundary from './ErrorBoundary.jsx';
 // 注册本地和网络字体，供 PDF 使用
 Font.register({
   family: 'Noto Sans SC',
-  src: './src/NotoSansSC-VariableFont_wght.ttf'
+  src: '/Resume-Builder/fonts/NotoSansSC-VariableFont_wght.ttf'
 });
 Font.register({
   family: 'Noto Serif SC',
-  src: './src/NotoSerifSC-VariableFont_wght.ttf'
+  src: '/Resume-Builder/fonts/NotoSerifSC-VariableFont_wght.ttf'
 });
 Font.register({
   family: 'ChironGoRoundTC',
-  src: './src/ChironGoRoundTC-VariableFont_wght.ttf'
+  src: '/Resume-Builder/fonts/ChironGoRoundTC-VariableFont_wght.ttf'
 });
 
 // SafeText：只有在 children 有非空文本时才渲染 <Text>
