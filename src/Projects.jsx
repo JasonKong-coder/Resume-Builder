@@ -42,7 +42,7 @@ const Projects = ({ t, resumeData, handleInputChange, handleAddSection, handleRe
                     <button className="remove-button" onClick={() => handleRemoveSection('projects', proj.id)}>{t.remove}</button>
                 </div>
             ))}
-            <button className="add-button" onClick={() => handleAddSection('projects', { title: '', description: '' })}>{t.addProject}</button>
+            <button className="add-button" onClick={() => handleAddSection('projects', { title: '', description: '',  url: ''  })}>{t.addProject}</button>
         </div>
     );
 };

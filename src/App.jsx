@@ -16,6 +16,7 @@ import Projects from './Projects.jsx';
 import Awards from './Awards.jsx';
 import Volunteering from './Volunteering.jsx';
 import DraggableSection from './DraggableSect.jsx';
+import ErrorBoundary from './ErrorBoundary.jsx';
 
 // 注册本地和网络字体，供 PDF 使用
 Font.register({
@@ -31,115 +32,223 @@ Font.register({
   src: './src/ChironGoRoundTC-VariableFont_wght.ttf'
 });
 
+// SafeText：只有在 children 有非空文本时才渲染 <Text>
+const SafeText = ({ children, style }) => {
+  if (children === null || children === undefined) return null;
+  const s = String(children).trim();
+  if (s === "") return null;
+  return <Text style={style}>{s}</Text>;
+};
+
+// sanitizeForPdf：把 resumeData 深度清理，移除空字符串 / 空对象，保留最小安全结构
+const sanitizeForPdf = (data) => {
+  const clean = (v) => {
+    if (v === null || v === undefined) return undefined;
+    if (typeof v === "string") {
+      const s = v.trim();
+      return s === "" ? undefined : s;
+    }
+    if (Array.isArray(v)) {
+      const arr = v
+        .map((x) => clean(x))
+        .filter((x) => {
+          if (x === undefined) return false;
+          if (typeof x === "object" && Object.keys(x).length === 0) return false;
+          return true;
+        });
+      return arr;
+    }
+    if (typeof v === "object") {
+      const obj = {};
+      Object.entries(v).forEach(([k, val]) => {
+        const c = clean(val);
+        if (c !== undefined) obj[k] = c;
+      });
+      // 如果对象变成空对象，返回 undefined（上层会过滤掉）
+      if (Object.keys(obj).length === 0) return undefined;
+      return obj;
+    }
+    return v;
+  };
+
+  // 深拷贝并清理
+  try {
+    return clean(JSON.parse(JSON.stringify(data))) || {};
+  } catch (e) {
+    console.error("sanitizeForPdf failed", e);
+    return data;
+  }
+};
+
 const ResumeDocument = ({ resumeData, t, sectionOrder, theme, customColors }) => {
+   const safeText = (value) => (value ? String(value) : "");
   const renderSection = (sectionName) => {
     const { personalInfo, workExperience, education, projects, certificate, awards, skills, languages, volunteering, website, aboutMe } = resumeData;
     const sections = {
-      personalInfo: personalInfo && (
-      <View style={styles.section} key="personalInfo">
-        {resumeData.personalInfo?.avatar && (
-        <Image style={styles.avatar} src={resumeData.personalInfo.avatar} />
-        )}
-        <Text style={styles.name}>{resumeData.personalInfo?.name}</Text>
-        <Text style={styles.p}>Email: {resumeData.personalInfo?.email}</Text>
-        <Text style={styles.p}>Phone: {resumeData.personalInfo?.phone}</Text>
-      </View>
-      ),
-      aboutMe: aboutMe && (
-        <View style={styles.section} key="aboutMe">
-          <Text style={styles.h2}>{t.aboutMe}</Text>
-          <Text style={styles.p}>{aboutMe}</Text>
-        </View>
-      ),
-      workExperience: workExperience.length > 0 && workExperience.filter(item => item.company).length > 0 && (
-        <View style={styles.section} key="workExperience">
-          <Text style={styles.h2}>{t.workExperience}</Text>
-          {workExperience.map((job) => (
-            <View key={job.id} style={styles.itemContainer}>
-              <Text style={styles.h3}>{job.position} @ {job.company}</Text>
-              <Text style={styles.p}>{job.startDate} - {job.endDate}</Text>
-              <Text style={styles.p}>{job.responsibilities}</Text>
-            </View>
-          ))}
-        </View>
-      ),
-      education: education.length > 0 && education[0].institution !== '' && (
-        <View style={styles.section} key="education">
-          <Text style={styles.h2}>{t.education}</Text>
-          {education.map((edu) => (
-            <View key={edu.id} style={styles.itemContainer}>
-              <Text style={styles.h3}>{edu.qualification} @ {edu.institution}</Text>
-              <Text style={styles.p}>{edu.graduationDate}</Text>
-            </View>
-          ))}
-        </View>
-      ),
-      projects: projects.length > 0 && projects[0]?.title !== '' && (
-        <View style={styles.section} key="projects">
-          <Text style={styles.h2}>{t.projects}</Text>
-          {projects.map((proj) => (
-            <View key={proj.id} style={styles.itemContainer}>
-              <Text style={styles.h3}>{proj.title}</Text>
-              <Text style={styles.p}>{proj.description}</Text>
-            </View>
-          ))}
-        </View>
-      ),
-      certificate: certificate.length > 0 && certificate[0].name !== '' && (
-        <View style={styles.section} key="certificate">
-          <Text style={styles.h2}>{t.certificate}</Text>
-          {certificate.map((cert) => (
-            <View key={cert.id} style={styles.itemContainer}>
-              <Text style={styles.p}>{cert.name} - {cert.date}</Text>
-            </View>
-          ))}
-        </View>
-      ),
-      awards: awards.length > 0 && awards[0].name !== '' && (
-        <View style={styles.section} key="awards">
-          <Text style={styles.h2}>{t.awards}</Text>
-          {awards.map((award) => (
-            <View key={award.id} style={styles.itemContainer}>
-              <Text style={styles.p}>{award.name} - {award.date}</Text>
-            </View>
-          ))}
-        </View>
-      ),
-      skills: skills.length > 0 && skills[0].name !== '' && (
-        <View style={styles.section} key="skills">
-          <Text style={styles.h2}>{t.skills}</Text>
-          <Text style={styles.p}>{skills.map(skill => skill.name).join(', ')}</Text>
-        </View>
-      ),
-      languages: languages.length > 0 && languages[0].name !== '' && (
-        <View style={styles.section} key="languages">
-          <Text style={styles.h2}>{t.languages}</Text>
-          <Text style={styles.p}>{languages.map(lang => `${lang.name} - ${lang.proficiency}`).join(', ')}</Text>
-        </View>
-      ),
-      volunteering: volunteering.length > 0 && volunteering[0].organization !== '' && (
-        <View style={styles.section} key="volunteering">
-          <Text style={styles.h2}>{t.volunteering}</Text>
-          {volunteering.map((vol) => (
-            <View key={vol.id} style={styles.itemContainer}>
-              <Text style={styles.h3}>{vol.role} @ {vol.organization}</Text>
-            </View>
-          ))}
-        </View>
-      ),
-      website: website.length > 0 && website[0].url !== '' && (
-        <View style={styles.section} key="websites">
-          <Text style={styles.h2}>{t.websites}</Text>
-          {website.map((site) => (
-            <View key={site.id} style={styles.itemContainer}>
-              <Text style={styles.p}>{site.name || site.url}</Text>
-            </View>
-          ))}
-        </View>
-      )
+      personalInfo:
+        personalInfo &&
+        (personalInfo.name || personalInfo.email || personalInfo.phone || personalInfo.avatar) && (
+          <View style={styles.section} key="personalInfo">
+            {personalInfo.avatar && (
+              <Image style={styles.avatar} src={personalInfo.avatar} />
+            )}
+            <SafeText style={styles.name}>{safeText(personalInfo.name)}</SafeText>
+            <SafeText style={styles.p}>Email: {safeText(personalInfo.email)}</SafeText>
+            <SafeText style={styles.p}>Phone: {safeText(personalInfo.phone)}</SafeText>
+          </View>
+        ),
+
+      aboutMe:
+        aboutMe && aboutMe.trim() !== "" && (
+          <View style={styles.section} key="aboutMe">
+            <SafeText style={styles.h2}>{t.aboutMe}</SafeText>
+            <SafeText style={styles.p}>{safeText(aboutMe)}</SafeText>
+          </View>
+        ),
+
+      workExperience:
+        workExperience.filter((job) => job && job.company && job.position).length > 0 && (
+          <View style={styles.section} key="workExperience">
+            <SafeText style={styles.h2}>{t.workExperience}</SafeText>
+            {workExperience
+              .filter((job) => job && job.company && job.position)
+              .map((job) => (
+                <View key={job.id} style={styles.itemContainer}>
+                  <SafeText style={styles.h3}>
+                    {safeText(job.position)} @ {safeText(job.company)}
+                  </SafeText>
+                  <SafeText style={styles.p}>
+                    {safeText(job.startDate)} - {safeText(job.endDate)}
+                  </SafeText>
+                  <SafeText style={styles.p}>{safeText(job.responsibilities)}</SafeText>
+                </View>
+              ))}
+          </View>
+        ),
+
+      education:
+        education.filter((edu) => edu && edu.institution && edu.qualification).length > 0 && (
+          <View style={styles.section} key="education">
+            <SafeText style={styles.h2}>{t.education}</SafeText>
+            {education
+              .filter((edu) => edu && edu.institution && edu.qualification)
+              .map((edu) => (
+                <View key={edu.id} style={styles.itemContainer}>
+                  <SafeText style={styles.h3}>
+                    {safeText(edu.qualification)} @ {safeText(edu.institution)}
+                  </SafeText>
+                  <SafeText style={styles.p}>{safeText(edu.graduationDate)}</SafeText>
+                </View>
+              ))}
+          </View>
+        ),
+
+      projects:
+        projects.filter((proj) => proj && proj.title).length > 0 && (
+          <View style={styles.section} key="projects">
+            <SafeText style={styles.h2}>{t.projects}</SafeText>
+            {projects
+              .filter((proj) => proj && proj.title)
+              .map((proj) => (
+                <View key={proj.id} style={styles.itemContainer}>
+                  <SafeText style={styles.h3}>{safeText(proj.title)}</SafeText>
+                  <SafeText style={styles.p}>{safeText(proj.description)}</SafeText>
+                </View>
+              ))}
+          </View>
+        ),
+
+      certificate:
+        certificate.filter((cert) => cert && cert.name).length > 0 && (
+          <View style={styles.section} key="certificate">
+            <SafeText style={styles.h2}>{t.certificate}</SafeText>
+            {certificate
+              .filter((cert) => cert && cert.name)
+              .map((cert) => (
+                <View key={cert.id} style={styles.itemContainer}>
+                  <SafeText style={styles.p}>
+                    {safeText(cert.name)} - {safeText(cert.date)}
+                  </SafeText>
+                </View>
+              ))}
+          </View>
+        ),
+
+      awards:
+        awards.filter((award) => award && award.name).length > 0 && (
+          <View style={styles.section} key="awards">
+            <SafeText style={styles.h2}>{t.awards}</SafeText>
+            {awards
+              .filter((award) => award && award.name)
+              .map((award) => (
+                <View key={award.id} style={styles.itemContainer}>
+                  <SafeText style={styles.p}>
+                    {safeText(award.name)} - {safeText(award.date)}
+                  </SafeText>
+                </View>
+              ))}
+          </View>
+        ),
+
+      skills:
+        skills.filter((skill) => skill && skill.name).length > 0 && (
+          <View style={styles.section} key="skills">
+            <SafeText style={styles.h2}>{t.skills}</SafeText>
+            <SafeText style={styles.p}>
+              {skills.filter((s) => s && s.name).map((s) => safeText(s.name)).join(", ")}
+            </SafeText>
+          </View>
+        ),
+
+      languages:
+        languages.filter((lang) => lang && lang.name).length > 0 && (
+          <View style={styles.section} key="languages">
+            <SafeText style={styles.h2}>{t.languages}</SafeText>
+            <SafeText style={styles.p}>
+              {languages
+                .filter((lang) => lang && lang.name)
+                .map((lang) => `${safeText(lang.name)} - ${safeText(lang.proficiency)}`)
+                .join(", ")}
+            </SafeText>
+          </View>
+        ),
+
+      volunteering:
+        volunteering.filter((vol) => vol && vol.organization && vol.role).length > 0 && (
+          <View style={styles.section} key="volunteering">
+            <SafeText style={styles.h2}>{t.volunteering}</SafeText>
+            {volunteering
+              .filter((vol) => vol && vol.organization && vol.role)
+              .map((vol) => (
+                <View key={vol.id} style={styles.itemContainer}>
+                  <SafeText style={styles.h3}>
+                    {safeText(vol.role)} @ {safeText(vol.organization)}
+                  </SafeText>
+                </View>
+              ))}
+          </View>
+        ),
+
+      website:
+        website.filter((site) => site && (site.url || site.name)).length > 0 && (
+          <View style={styles.section} key="websites">
+            <SafeText style={styles.h2}>{t.websites}</SafeText>
+            {website
+              .filter((site) => site && (site.url || site.name))
+              .map((site) => (
+                <View key={site.id} style={styles.itemContainer}>
+                  <SafeText style={styles.p}>
+                    {safeText(site.name) || safeText(site.url)}
+                  </SafeText>
+                </View>
+              ))}
+          </View>
+        ),
     };
+
     return sections[sectionName];
   };
+
 
   // 根据 theme 和 customColors 动态设置 PDF 样式
   let fontFamily = 'Noto Sans SC';
@@ -177,12 +286,15 @@ const ResumeDocument = ({ resumeData, t, sectionOrder, theme, customColors }) =>
       borderBottomColor: borderColor,
     },
     avatar: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    marginBottom: 10,
-    alignSelf: 'center',
-    },
+      width: 120, // 和 preview 差不多
+      height: 120,
+      borderRadius: 60, // 一半高度，保持圆形
+      objectFit: 'cover', // react-pdf 里用的是 `objectFit`
+      borderWidth: 3,
+      borderColor: '#007bff',
+      marginBottom: 10,
+      alignSelf: 'center',
+},
     name: {
       fontSize: 24,
       textAlign: 'center',
@@ -221,7 +333,6 @@ const ResumeDocument = ({ resumeData, t, sectionOrder, theme, customColors }) =>
     </Document>
   );
 };
-
 
 
 const App = () => {
@@ -545,6 +656,16 @@ const App = () => {
       }
     };
 
+  const handleRemoveAvatar = () => {
+    setResumeData(prevData => ({
+      ...prevData,
+      personalInfo: {
+        ...prevData.personalInfo,
+      avatar: null, // 清空头像
+      },
+    }));
+  };
+
   // 处理静态字段的函数
   const handlePersonalInfoChange = (e) => {
     const { name, value } = e.target;
@@ -554,6 +675,15 @@ const App = () => {
       [name]: value }
     }));
   };
+
+  const handleAboutMeChange = (e) => {
+    const { value } = e.target;
+    setResumeData(prevData => ({
+        ...prevData,
+        aboutMe: value // 正确地更新 aboutMe 字符串
+    }));
+};
+
 
   // 处理动态列表的函数，需要 section 和 id
   const handleInputChange = (e, section, id) => {
@@ -606,7 +736,10 @@ const App = () => {
     document.documentElement.style.setProperty(`--custom-${name}`, value);
   };
 
+  const cleanedResumeData = sanitizeForPdf(resumeData);
+
   return (
+  <ErrorBoundary>
   <div className={`container theme-${theme}`}>
     <header className='header'>
       <div className='header-left'>
@@ -666,6 +799,7 @@ const App = () => {
             resumeData={resumeData}
             handlePersonalInfoChange={handlePersonalInfoChange}
             handleAvatarChange={handleAvatarChange}
+            handleRemoveAvatar={handleRemoveAvatar}
           />
         </DraggableSection>
         
@@ -673,7 +807,7 @@ const App = () => {
           <AboutMe
             t={t}
             resumeData={resumeData}
-            handlePersonalInfoChange={(e) => handleInputChange(e, 'aboutMe')}
+            handleAboutMeChange={handleAboutMeChange}
           />
         </DraggableSection>
         
@@ -780,7 +914,7 @@ const App = () => {
               case 'personalInfo':
               return (
                 <section key={sectionId} className='personal-info-preview'>
-                  {resumeData.avatar && (
+                  {resumeData.personalInfo.avatar && (
                     <img src={resumeData.personalInfo.avatar} alt="Avatar" className='avatar-preview' />
                   )}
                   <h3>{resumeData.personalInfo.name}</h3>
@@ -929,20 +1063,26 @@ const App = () => {
           })}
         </div>
         <div>
-            <PDFDownloadLink
-            document={<ResumeDocument resumeData={resumeData} t={t} sectionOrder={sectionOrder} theme={theme} customColors={customColors} />}
+          <PDFDownloadLink
+            document={
+              <ResumeDocument
+                resumeData={cleanedResumeData}
+                t={t}
+                sectionOrder={sectionOrder}
+                theme={theme}
+                customColors={customColors}
+              />
+            }
             fileName="resume.pdf"
             className="generate-pdf-button"
-
-            >
-              {({ loading }) =>
-               loading ? t.loading : t.generatePdf
-               }
-            </PDFDownloadLink>
-            </div>
+          >
+            {({ loading }) => (loading ? t.loading : t.generatePdf)}
+          </PDFDownloadLink>
+        </div>
       </div>
     </main>
   </div>
+  </ErrorBoundary>
   );
 };
 

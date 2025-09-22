@@ -1,6 +1,6 @@
 import React from 'react';
 
-const PersonalInfo = ({ t, resumeData, handlePersonalInfoChange, handleAvatarChange }) => {
+const PersonalInfo = ({ t, resumeData, handlePersonalInfoChange, handleAvatarChange, handleRemoveAvatar }) => {
   return (
     <div className='form-section'>
       <h2 className='section-title'>{t.personalInfo}</h2>
@@ -32,7 +32,17 @@ const PersonalInfo = ({ t, resumeData, handlePersonalInfoChange, handleAvatarCha
               />
             </label>
           )}
-        </div>
+          </div>
+          {resumeData.personalInfo.avatar && (
+          <button 
+            type="button" 
+            className="remove-avatar-x"
+            onClick={handleRemoveAvatar}
+          >
+            {t.remove} {t.avatar}
+          </button>
+          )}
+
         
         <label htmlFor="name" className="form-label">{t.name}</label>
         <input
