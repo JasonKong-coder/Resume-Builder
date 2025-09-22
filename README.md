@@ -7,6 +7,7 @@ Create, preview, and export your resume to PDF with ease.
 
 📜 License
 MIT License
+
 ---
 
 ## ✨ Features
