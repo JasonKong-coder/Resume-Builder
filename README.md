@@ -6,7 +6,7 @@ Create, preview, and export your resume to PDF with ease.
 🌐 **Live Demo**: [Resume Builder](https://jasonkong-coder.github.io/Resume-Builder/)
 
 📜 License
-MIT License
+* MIT License
 
 ---
 
@@ -70,7 +70,7 @@ If you find bugs or have suggestions, feel free to submit an **Issue** or a **Pu
 🌐 **在线预览**: [Resume Builder](https://jasonkong-coder.github.io/Resume-Builder/)
 
 📜 许可证
-MIT License
+* MIT License
 
 ---
 
