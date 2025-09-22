@@ -42,7 +42,7 @@ npm run build
 
 # Deploy to GitHub Pages
 npm run deploy
-
+···
 🌐 Live Demo
 👉 [View Online](https://jasonkong-coder.github.io/Resume-Builder/)
 
@@ -51,7 +51,6 @@ npm run deploy
 
 📜 License
 MIT License
-
 ---
 
 ## ✅ 中文版 README
@@ -101,7 +100,7 @@ npm run build
 
 # 部署到 GitHub Pages
 npm run deploy
-
+···
 🌐 在线预览
 👉 [点击查看](https://jasonkong-coder.github.io/Resume-Builder/)
 
